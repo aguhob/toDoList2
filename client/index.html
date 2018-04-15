@@ -1,0 +1,129 @@
+<!doctype html>
+
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  
+  <!--<title>To-Do List App</title>-->
+  <!--<meta name="description" content="The HTML5 Herald">-->
+  <!--<meta name="author" content="SitePoint">-->
+  <!--<script src="js/jquery.min.js"></script>-->
+  <!--<script src="/socket.io/socket.io.js"></script>-->
+  <title>DAILY TO DO</title>
+  <meta name="description" content="DAILY TO DO">
+  <meta name="author" content="Minda Aguhob">
+
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/bootstrap.min.css" />
+  <!--<link rel="stylesheet" href="css/styles.css?v=1.0" />-->
+
+  <script src="js/jquery-3.3.1.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <style>
+  #output {
+    background: #FF0080;
+    width: 500px;
+    height: 600px;
+  }
+  </style>
+
+  <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+  <![endif]-->
+</head>
+
+<body>
+  
+  <!--<h1>Create New Note</h1>-->
+  
+  <!--<form action="script.php">-->
+  <!--  <textarea id="input"></textarea>-->
+  <!--</form>-->
+  
+  <!--<button id="submit">Submit New Note</button>-->
+  
+     <div class="container">
+        <br>
+        <div class="jumbotron">
+            <h1 class="display-4" >To Do List</h1>
+            <h4>Below are the things to focus on today.</h4>
+        </div>
+        
+        <br>
+        <input class='form-control' placeholder="thing to do">
+        <br>
+        <button id="send" class="btn btn-success">Submit</button>
+        
+    </div>
+    
+  
+  <!--<h1>Current Notes</h1>-->
+  <!--<div id="output">-->
+  <!--</div>-->
+      <div class="container">
+        <br>
+        <div class="jumbotron">
+            <h2 class="display-4" >4 Focuses:</h2>
+            <div id="output">
+  
+        </div>
+        
+    </div>
+    
+  <script>
+  /* global $ io*/
+  retrieveNotes();
+  
+  var socket = io();
+  socket.on('important', function (data) {
+    buildList(data);
+  });
+  
+  var text = $('#input').val();
+  var note = {note: text};
+  
+  $('#submit').click(function () {
+    text = $('#input').val();
+    note = {notes: text};
+    sendToServer(note);
+  });
+  
+  $('.deleteButton').click(function(){
+    var noteId = $(this).getAttr('data-id');
+    console.log(noteId);
+  })
+  
+  function sendToServer(sendData) {
+    $.post('https://todolist2-minda.c9users.io/submitNote', sendData);
+  }
+  
+  function deleteAtServer(idString) {
+    $.post('https://todolist2-minda.c9users.io/deleteNote', idString);
+  }
+  
+  function retrieveNotes() {
+    $.get('https://todolist2-minda.c9users.io/getNotes', function(data) {
+      buildList(data);
+      console.log(data);
+    });
+  }
+  
+  function buildList(data) {
+    var htmlString = "<ul>";
+    
+    for (var i = 0; i < data.length; i++){
+      htmlString = htmlString + "<button class='deleteButton' data-id=" +data[i]._id  + ">Delete</button><li class='note'>" + data[i].notes + "</li>";
+    }
+    
+    htmlString += "</ul>";
+    
+    $("#output").html(htmlString);
+  } 
+  
+  //https://codeshare.io/5RlPRL
+  
+  </script>
+</body>
+</html>
